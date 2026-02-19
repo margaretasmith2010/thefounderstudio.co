@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Founder Studio — Coming Soon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:      #080807;
+      --gold:       #C4933F;
+      --gold-light: #DDB96A;
+      --gold-dim:   rgba(196,147,63,0.12);
+      --cream:      #F0EBE1;
+      --muted:      #7C7568;
+      --faint:      rgba(240,235,225,0.05);
+      --border:     rgba(196,147,63,0.18);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--black);
+      color: var(--cream);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 999; opacity: 0.5;
+    }
+
+    /* Ambient glows */
+    .glow-top {
+      position: fixed;
+      top: -200px; left: 50%; transform: translateX(-50%);
+      width: 900px; height: 700px;
+      background: radial-gradient(ellipse at center, rgba(196,147,63,0.08) 0%, transparent 65%);
+      pointer-events: none; z-index: 0;
+    }
+    .glow-br {
+      position: fixed;
+      bottom: -200px; right: -150px;
+      width: 600px; height: 600px;
+      background: radial-gradient(ellipse at center, rgba(196,147,63,0.05) 0%, transparent 65%);
+      pointer-events: none; z-index: 0;
+    }
+
+    .page {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      padding: 2rem 3.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      opacity: 0;
+      animation: rise 0.9s ease forwards 0.1s;
+    }
+
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      color: var(--cream);
+    }
+    .logo .dot { color: var(--gold); }
+
+    .nav-pill {
+      font-size: 0.62rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid var(--border);
+      padding: 0.45rem 1rem;
+      font-weight: 500;
+    }
+
+    /* ─── MAIN ─── */
+    main {
+      padding: 5.5rem 3.5rem 4rem;
+      max-width: 940px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Eyebrow */
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2.75rem;
+      opacity: 0;
+      animation: rise 0.8s ease forwards 0.35s;
+    }
+    .eyebrow-line { width: 40px; height: 1px; background: var(--gold); flex-shrink: 0; }
+    .eyebrow-text {
+      font-size: 0.62rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 500;
+    }
+
+    /* Headline */
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.2rem, 7.5vw, 6.2rem);
+      font-weight: 700;
+      line-height: 1.03;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.5rem;
+      opacity: 0;
+      animation: rise 1s ease forwards 0.5s;
+    }
+    h1 em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+
+    .headline-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.2rem, 2.5vw, 1.75rem);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--muted);
+      margin-bottom: 3.5rem;
+      opacity: 0;
+      animation: rise 1s ease forwards 0.65s;
+    }
+
+    /* Rule */
+    .rule {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      margin-bottom: 2.75rem;
+      opacity: 0;
+      animation: rise 0.8s ease forwards 0.78s;
+    }
+    .rule-line { height: 1px; background: linear-gradient(to right, var(--gold), transparent); width: 70px; }
+    .rule-diamond { width: 5px; height: 5px; background: var(--gold); transform: rotate(45deg); flex-shrink: 0; }
+
+    /* Body copy */
+    .body {
+      font-size: clamp(1rem, 1.6vw, 1.1rem);
+      line-height: 1.9;
+      color: #b5ada1;
+      max-width: 640px;
+      margin-bottom: 1.6rem;
+      opacity: 0;
+      animation: rise 0.9s ease forwards 0.9s;
+    }
+    .body strong { color: var(--cream); font-weight: 500; }
+
+    .body-2 {
+      font-size: clamp(0.95rem, 1.45vw, 1.02rem);
+      line-height: 1.9;
+      color: #918982;
+      max-width: 620px;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: rise 0.9s ease forwards 1.02s;
+    }
+    .body-2 em { color: #b5ada1; font-style: normal; }
+
+    /* Program block */
+    .program-block {
+      border: 1px solid var(--border);
+      background: rgba(196,147,63,0.03);
+      padding: 2rem 2.25rem;
+      max-width: 620px;
+      margin-bottom: 1.75rem;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      animation: rise 0.9s ease forwards 1.12s;
+    }
+    .program-block::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 2px; height: 100%;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+    }
+
+    .program-label {
+      font-size: 0.58rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 500;
+      margin-bottom: 0.65rem;
+    }
+
+    .program-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.4rem, 2.5vw, 1.75rem);
+      font-weight: 700;
+      color: var(--cream);
+      margin-bottom: 1.1rem;
+      line-height: 1.2;
+    }
+    .program-name sup { font-size: 0.5em; color: var(--gold); vertical-align: super; }
+
+    .founder-qs {
+      border-top: 1px solid var(--border);
+      padding-top: 1.1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .founder-qs-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.85rem;
+      font-weight: 500;
+    }
+
+    .q-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .q-list li {
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: #9a928a;
+      padding-left: 1.1rem;
+      position: relative;
+    }
+    .q-list li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: rgba(196,147,63,0.4);
+      font-size: 0.75rem;
+    }
+
+    .program-cta-text {
+      font-size: 0.88rem;
+      line-height: 1.8;
+      color: #b5ada1;
+      border-top: 1px solid var(--border);
+      padding-top: 1.1rem;
+      margin-top: 0.25rem;
+    }
+    .program-cta-text strong { color: var(--cream); font-weight: 500; }
+
+    /* Social proof whisper */
+    .proof-whisper {
+      font-size: 0.67rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(196,147,63,0.45);
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: rise 0.8s ease forwards 1.22s;
+    }
+
+    /* ─── FORM ─── */
+    .form-section {
+      opacity: 0;
+      animation: rise 0.9s ease forwards 1.32s;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.88rem;
+      color: #b5ada1;
+      margin-bottom: 1.25rem;
+      line-height: 1.6;
+      max-width: 500px;
+    }
+
+    /* Two fields stacked, button on bottom */
+    .form-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      max-width: 500px;
+    }
+
+    .form-input {
+      background: var(--faint);
+      border: 1px solid var(--border);
+      border-bottom: none;
+      color: var(--cream);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 300;
+      padding: 0.95rem 1.3rem;
+      outline: none;
+      transition: border-color 0.3s, background 0.3s;
+      border-radius: 0;
+      -webkit-appearance: none;
+      width: 100%;
+    }
+    .form-input:last-of-type {
+      border-bottom: none;
+    }
+    .form-input::placeholder { color: #4e4a44; }
+    .form-input:focus {
+      border-color: rgba(196,147,63,0.4);
+      background: rgba(255,255,255,0.04);
+      position: relative;
+      z-index: 1;
+    }
+    .form-input.error { border-color: rgba(200,80,80,0.45); }
+
+    .form-btn {
+      background: var(--gold);
+      color: #080807;
+      border: none;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.67rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      padding: 1rem 1.6rem;
+      cursor: pointer;
+      transition: background 0.25s, transform 0.15s;
+      white-space: nowrap;
+      border-radius: 0;
+      width: 100%;
+      max-width: 500px;
+      border: 1px solid var(--gold);
+    }
+    .form-btn:hover { background: var(--gold-light); border-color: var(--gold-light); }
+    .form-btn:active { transform: scale(0.99); }
+
+    .form-note {
+      font-size: 0.68rem;
+      color: #4e4a44;
+      margin-top: 1rem;
+    }
+
+    /* Success */
+    .success-msg {
+      display: none;
+      align-items: flex-start;
+      gap: 0.85rem;
+      max-width: 500px;
+      padding: 1.1rem 1.4rem;
+      border: 1px solid var(--border);
+      background: var(--gold-dim);
+    }
+    .success-msg.show { display: flex; }
+    .success-icon { color: var(--gold); font-size: 0.9rem; margin-top: 2px; flex-shrink: 0; }
+    .success-text { font-size: 0.87rem; color: #b5ada1; line-height: 1.6; }
+    .success-text strong { color: var(--cream); font-weight: 500; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      padding: 1.6rem 3.5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      opacity: 0;
+      animation: rise 0.8s ease forwards 1.48s;
+    }
+
+    .footer-text {
+      font-size: 0.67rem;
+      color: #4a4640;
+      letter-spacing: 0.04em;
+    }
+    .footer-text span { color: rgba(196,147,63,0.35); margin: 0 0.4rem; }
+
+    .footer-links { display: flex; gap: 1.75rem; }
+    .footer-links a {
+      font-size: 0.62rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #4a4640;
+      text-decoration: none;
+      transition: color 0.25s;
+    }
+    .footer-links a:hover { color: var(--gold-light); }
+
+    /* ─── ANIMATION ─── */
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 640px) {
+      nav, footer { padding-left: 1.5rem; padding-right: 1.5rem; }
+      main { padding: 3rem 1.5rem 3rem; }
+      footer { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glow-top"></div>
+  <div class="glow-br"></div>
+
+  <div class="page">
+
+    <!-- NAV -->
+    <nav>
+      <div class="logo">The Founder Studio<span class="dot">.</span></div>
+      <div class="nav-pill">Coming Soon</div>
+    </nav>
+
+    <!-- MAIN -->
+    <main>
+
+      <div class="eyebrow">
+        <div class="eyebrow-line"></div>
+        <span class="eyebrow-text">A New Kind of Strategy Studio</span>
+      </div>
+
+      <h1>
+        Built for Founders<br />
+        Who Build <em>Different.</em>
+      </h1>
+
+      <p class="headline-sub">
+        Clear Strategy. Bold Ideas. Sustainable Growth.
+      </p>
+
+      <div class="rule">
+        <div class="rule-line"></div>
+        <div class="rule-diamond"></div>
+      </div>
+
+      <p class="body">
+        We hold strategy like an art form — grounded, intentional, human-centered.
+        A studio built at the intersection of <strong>purpose and power</strong>,
+        where visionary Black founders are deeply supported, and clarity becomes
+        the launchpad for sustainable growth.
+      </p>
+
+      <p class="body-2">
+        Whether you're mapping your next move, refining your model, or holding space to think bigger,
+        this is the place for you. A studio that understands the difference between
+        scaling fast and <em>building something worth scaling.</em>
+      </p>
+
+      <!-- FLAGSHIP PROGRAM -->
+      <div class="program-block">
+        <div class="program-label">Flagship Offering — Launching Soon</div>
+        <div class="program-name">Scaling Beyond Yourself<sup>™</sup></div>
+
+        <div class="founder-qs">
+          <p class="founder-qs-label">Sound familiar?</p>
+          <ul class="q-list">
+            <li>What would happen to my company if I stepped away for a week?</li>
+            <li>Why does my team still overly depend on me?</li>
+            <li>Do I need more people or better structure?</li>
+            <li>Why does growth feel heavy?</li>
+          </ul>
+        </div>
+
+        <p class="program-cta-text">
+          If these questions have crossed your mind, you're at an inflection point. Not a failure point.
+          <br /><br />
+          <strong>Scaling Beyond Yourself™</strong> helps founders see exactly where the business depends on them,
+          and what must change to unlock real scale, real freedom, and a company built to run beyond you.
+          No fluff. No theory. <strong>Just the truth, and a clear path forward.</strong>
+        </p>
+      </div>
+
+      <p class="proof-whisper">
+        15+ years of strategy experience &nbsp;·&nbsp; Healthcare · SaaS · Consulting · Wellness · And More
+      </p>
+
+      <!-- FORM -->
+      <div class="form-section">
+        <p class="form-label">A table built for founders like you. Drop your name and email to be the first to know when we open the doors.</p>
+
+        <div class="form-fields" id="formFields">
+          <input
+            class="form-input"
+            type="text"
+            id="nameInput"
+            placeholder="Your first name"
+            autocomplete="given-name"
+          />
+          <input
+            class="form-input"
+            type="email"
+            id="emailInput"
+            placeholder="Your email address"
+            autocomplete="email"
+            style="border-bottom: 1px solid var(--border);"
+          />
+        </div>
+        <button class="form-btn" id="submitBtn" onclick="handleSignup()" style="margin-top: 2px;">Get Early Access</button>
+
+        <div class="success-msg" id="successMsg">
+          <span class="success-icon">✦</span>
+          <span class="success-text" id="successText">
+            <strong>You're in.</strong> Something meaningful is coming — and you'll be the first to know.
+          </span>
+        </div>
+
+        <p class="form-note" id="formNote">Early access only. No noise. Unsubscribe anytime.</p>
+      </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-text">
+        © 2025 The Founder Studio<span>·</span>Strategy for those who build with purpose.
+      </div>
+      <div class="footer-links">
+        <a href="#">LinkedIn</a>
+        <a href="#">Instagram</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    function handleSignup() {
+      const nameInput  = document.getElementById('nameInput');
+      const emailInput = document.getElementById('emailInput');
+      const name  = nameInput.value.trim();
+      const email = emailInput.value.trim();
+      const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+      // Reset errors
+      nameInput.classList.remove('error');
+      emailInput.classList.remove('error');
+
+      let hasError = false;
+
+      if (!name) {
+        nameInput.classList.add('error');
+        nameInput.placeholder = 'Please enter your name';
+        setTimeout(() => { nameInput.classList.remove('error'); nameInput.placeholder = 'Your first name'; }, 2500);
+        hasError = true;
+      }
+
+      if (!emailValid) {
+        emailInput.classList.add('error');
+        emailInput.placeholder = 'Please enter a valid email';
+        emailInput.value = '';
+        setTimeout(() => { emailInput.classList.remove('error'); emailInput.placeholder = 'Your email address'; }, 2500);
+        hasError = true;
+      }
+
+      if (hasError) return;
+
+      // Success
+      document.getElementById('formFields').style.display = 'none';
+      document.getElementById('submitBtn').style.display = 'none';
+      document.getElementById('formNote').style.display = 'none';
+
+      const firstName = name.split(' ')[0];
+      document.getElementById('successText').innerHTML =
+        `<strong>You're in, ${firstName}.</strong> Something meaningful is coming — and you'll be the first to know.`;
+
+      document.getElementById('successMsg').classList.add('show');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('emailInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter') handleSignup();
+      });
+      document.getElementById('nameInput').addEventListener('keydown', e => {
+        if (e.key === 'Enter') document.getElementById('emailInput').focus();
+      });
+    });
+  </script>
+
+</body>
+</html>
