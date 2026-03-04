@@ -469,7 +469,7 @@
       <!-- FLAGSHIP PROGRAM -->
       <div class="program-block">
         <div class="program-label">Flagship Offering — Launching Soon</div>
-        <div class="program-name">Scaling Beyond Yourself<sup>™</sup></div>
+        <div class="program-name"><a href="https://beyond.thefounderstudio.co/" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(196,147,63,0.4);padding-bottom:1px;transition:border-color 0.25s;">Scaling Beyond Yourself<sup>™</sup></a></div>
 
         <div class="founder-qs">
           <p class="founder-qs-label">Sound familiar?</p>
@@ -543,7 +543,7 @@
   </div>
 
   <script>
-    function handleSignup() {
+    async function handleSignup() {
       const nameInput  = document.getElementById('nameInput');
       const emailInput = document.getElementById('emailInput');
       const name  = nameInput.value.trim();
@@ -573,16 +573,43 @@
 
       if (hasError) return;
 
-      // Success
-      document.getElementById('formFields').style.display = 'none';
-      document.getElementById('submitBtn').style.display = 'none';
-      document.getElementById('formNote').style.display = 'none';
+      // Disable button while submitting
+      const btn = document.getElementById('submitBtn');
+      btn.textContent = 'Submitting...';
+      btn.disabled = true;
 
-      const firstName = name.split(' ')[0];
-      document.getElementById('successText').innerHTML =
-        `<strong>You're in, ${firstName}.</strong> Something meaningful is coming — and you'll be the first to know.`;
+      try {
+        const response = await fetch('https://formspree.io/f/mdalqzwz', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ name: name, email: email })
+        });
 
-      document.getElementById('successMsg').classList.add('show');
+        if (response.ok) {
+          // Success
+          document.getElementById('formFields').style.display = 'none';
+          document.getElementById('submitBtn').style.display = 'none';
+          document.getElementById('formNote').style.display = 'none';
+          const firstName = name.split(' ')[0];
+          document.getElementById('successText').innerHTML =
+            `<strong>You're in, ${firstName}.</strong> Something meaningful is coming — and you'll be the first to know.`;
+          document.getElementById('successMsg').classList.add('show');
+        } else {
+          // Server error
+          btn.textContent = 'Get Access';
+          btn.disabled = false;
+          btn.style.background = 'rgba(200,80,80,0.8)';
+          btn.textContent = 'Something went wrong — try again';
+          setTimeout(() => {
+            btn.style.background = '';
+            btn.textContent = 'Get Access';
+          }, 3000);
+        }
+      } catch (err) {
+        // Network error
+        btn.textContent = 'Get Access';
+        btn.disabled = false;
+      }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
